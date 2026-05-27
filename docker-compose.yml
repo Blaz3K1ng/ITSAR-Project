@@ -1,0 +1,242 @@
+version: '3.8'
+
+networks:
+  brewbridge-net:
+    driver: bridge
+
+volumes:
+  auth-db-data:
+  inventory-db-data:
+  sales-db-data:
+  hr-db-data:
+  crm-db-data:
+  rabbitmq-data:
+
+services:
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: brewbridge-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - brewbridge-net
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth-db:
+    image: postgres:15-alpine
+    container_name: brewbridge-auth-db
+    environment:
+      POSTGRES_USER: ${AUTH_DB_USER:-auth_user}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD:-auth_password}
+      POSTGRES_DB: ${AUTH_DB_NAME:-auth_db}
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+      - ./services/auth-service/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - brewbridge-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${AUTH_DB_USER:-auth_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth-service:
+    build: ./services/auth-service
+    container_name: brewbridge-auth
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      JWT_SECRET: ${JWT_SECRET:-dev_secret}
+      DB_HOST: auth-db
+      DB_PORT: 5432
+      DB_USER: ${AUTH_DB_USER:-auth_user}
+      DB_PASSWORD: ${AUTH_DB_PASSWORD:-auth_password}
+      DB_NAME: ${AUTH_DB_NAME:-auth_db}
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    networks:
+      - brewbridge-net
+    restart: unless-stopped
+
+  inventory-db:
+    image: postgres:15-alpine
+    container_name: brewbridge-inventory-db
+    environment:
+      POSTGRES_USER: ${INVENTORY_DB_USER:-inventory_user}
+      POSTGRES_PASSWORD: ${INVENTORY_DB_PASSWORD:-inventory_password}
+      POSTGRES_DB: ${INVENTORY_DB_NAME:-inventory_db}
+    volumes:
+      - inventory-db-data:/var/lib/postgresql/data
+      - ./services/inventory-service/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - brewbridge-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${INVENTORY_DB_USER:-inventory_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  inventory-service:
+    build: ./services/inventory-service
+    container_name: brewbridge-inventory
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      JWT_SECRET: ${JWT_SECRET:-dev_secret}
+      DB_HOST: inventory-db
+      DB_PORT: 5432
+      DB_USER: ${INVENTORY_DB_USER:-inventory_user}
+      DB_PASSWORD: ${INVENTORY_DB_PASSWORD:-inventory_password}
+      DB_NAME: ${INVENTORY_DB_NAME:-inventory_db}
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672}
+    depends_on:
+      inventory-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - brewbridge-net
+    restart: unless-stopped
+
+  sales-db:
+    image: postgres:15-alpine
+    container_name: brewbridge-sales-db
+    environment:
+      POSTGRES_USER: ${SALES_DB_USER:-sales_user}
+      POSTGRES_PASSWORD: ${SALES_DB_PASSWORD:-sales_password}
+      POSTGRES_DB: ${SALES_DB_NAME:-sales_db}
+    volumes:
+      - sales-db-data:/var/lib/postgresql/data
+      - ./services/sales-service/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - brewbridge-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${SALES_DB_USER:-sales_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  sales-service:
+    build: ./services/sales-service
+    container_name: brewbridge-sales
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      JWT_SECRET: ${JWT_SECRET:-dev_secret}
+      DB_HOST: sales-db
+      DB_PORT: 5432
+      DB_USER: ${SALES_DB_USER:-sales_user}
+      DB_PASSWORD: ${SALES_DB_PASSWORD:-sales_password}
+      DB_NAME: ${SALES_DB_NAME:-sales_db}
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672}
+    depends_on:
+      sales-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - brewbridge-net
+    restart: unless-stopped
+
+  hr-db:
+    image: postgres:15-alpine
+    container_name: brewbridge-hr-db
+    environment:
+      POSTGRES_USER: ${HR_DB_USER:-hr_user}
+      POSTGRES_PASSWORD: ${HR_DB_PASSWORD:-hr_password}
+      POSTGRES_DB: ${HR_DB_NAME:-hr_db}
+    volumes:
+      - hr-db-data:/var/lib/postgresql/data
+      - ./services/hr-service/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - brewbridge-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${HR_DB_USER:-hr_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  hr-service:
+    build: ./services/hr-service
+    container_name: brewbridge-hr
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      JWT_SECRET: ${JWT_SECRET:-dev_secret}
+      DB_HOST: hr-db
+      DB_PORT: 5432
+      DB_USER: ${HR_DB_USER:-hr_user}
+      DB_PASSWORD: ${HR_DB_PASSWORD:-hr_password}
+      DB_NAME: ${HR_DB_NAME:-hr_db}
+    depends_on:
+      hr-db:
+        condition: service_healthy
+    networks:
+      - brewbridge-net
+    restart: unless-stopped
+
+  crm-db:
+    image: postgres:15-alpine
+    container_name: brewbridge-crm-db
+    environment:
+      POSTGRES_USER: ${CRM_DB_USER:-crm_user}
+      POSTGRES_PASSWORD: ${CRM_DB_PASSWORD:-crm_password}
+      POSTGRES_DB: ${CRM_DB_NAME:-crm_db}
+    volumes:
+      - crm-db-data:/var/lib/postgresql/data
+      - ./services/crm-service/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - brewbridge-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${CRM_DB_USER:-crm_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  crm-service:
+    build: ./services/crm-service
+    container_name: brewbridge-crm
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      JWT_SECRET: ${JWT_SECRET:-dev_secret}
+      DB_HOST: crm-db
+      DB_PORT: 5432
+      DB_USER: ${CRM_DB_USER:-crm_user}
+      DB_PASSWORD: ${CRM_DB_PASSWORD:-crm_password}
+      DB_NAME: ${CRM_DB_NAME:-crm_db}
+    depends_on:
+      crm-db:
+        condition: service_healthy
+    networks:
+      - brewbridge-net
+    restart: unless-stopped
+
+  api-gateway:
+    build: ./gateway
+    container_name: brewbridge-gateway
+    ports:
+      - "80:80"
+    depends_on:
+      - auth-service
+      - inventory-service
+      - sales-service
+      - hr-service
+      - crm-service
+    networks:
+      - brewbridge-net
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: brewbridge-frontend
+    networks:
+      - brewbridge-net
+    restart: unless-stopped
