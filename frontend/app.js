@@ -8,6 +8,15 @@ function authHeaders() {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+function roleFromToken(jwtToken) {
+  try {
+    const payload = JSON.parse(atob(jwtToken.split(".")[1]));
+    return payload.role;
+  } catch {
+    return undefined;
+  }
+}
+
 async function callApi(path, options = {}) {
   const response = await fetch(`${baseUrl()}${path}`, {
     ...options,
@@ -47,7 +56,7 @@ document.getElementById("loginBtn").onclick = async () => {
       body: JSON.stringify(payload),
     });
     token = result.access_token;
-    write("authStatus", `Logged in as role: ${result.role}`);
+    write("authStatus", `Logged in as role: ${result.role || roleFromToken(token) || "unknown"}`);
   } catch (error) {
     write("authStatus", error.message);
   }

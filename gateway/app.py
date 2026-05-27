@@ -42,6 +42,7 @@ async def forward_request(request: Request, service_key: str, subpath: str) -> R
         for k, v in request.headers.items()
         if k.lower() not in {"host", "accept-encoding"}
     }
+    headers["Accept-Encoding"] = "identity"
     body = await request.body()
 
     async with httpx.AsyncClient(timeout=20.0) as client:
