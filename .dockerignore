@@ -1,0 +1,5 @@
+node_modules
+npm-debug.log
+services/*/data/*.db
+services/*/data/*.json
+.git

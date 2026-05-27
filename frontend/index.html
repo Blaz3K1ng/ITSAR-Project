@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brew Haven ERP</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">ITSAR Capstone ERP</p>
+          <h1>Brew Haven ERP</h1>
+          <p>
+            A lean microservices ERP for a fictional regional coffee shop chain. Use the seeded staff
+            accounts to sign in and exercise the main business flows.
+          </p>
+        </div>
+        <div class="card credentials">
+          <h2>Seeded users</h2>
+          <ul>
+            <li><strong>admin</strong> / admin123</li>
+            <li><strong>manager</strong> / manager123</li>
+            <li><strong>cashier</strong> / cashier123</li>
+            <li><strong>buyer</strong> / buyer123</li>
+            <li><strong>marketing</strong> / marketing123</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <h2>1. Login</h2>
+          <form id="login-form">
+            <label>
+              Username
+              <input name="username" value="manager" required />
+            </label>
+            <label>
+              Password
+              <input name="password" type="password" value="manager123" required />
+            </label>
+            <button type="submit">Login</button>
+          </form>
+          <p id="session-summary">Not logged in.</p>
+        </article>
+
+        <article class="card">
+          <h2>2. Add customer</h2>
+          <form id="customer-form">
+            <label>
+              Customer ID
+              <input name="id" value="crm-new" required />
+            </label>
+            <label>
+              Name
+              <input name="name" value="New Customer" required />
+            </label>
+            <label>
+              Email
+              <input name="email" value="new.customer@example.com" required />
+            </label>
+            <button type="submit">Create customer</button>
+          </form>
+        </article>
+
+        <article class="card">
+          <h2>3. Raise purchase order</h2>
+          <form id="purchase-form">
+            <label>
+              PO ID
+              <input name="id" value="po-2026" required />
+            </label>
+            <label>
+              Supplier
+              <select name="supplierId" id="supplier-select"></select>
+            </label>
+            <label>
+              Item name
+              <input name="itemName" value="Arabica Beans" required />
+            </label>
+            <label>
+              Quantity
+              <input name="quantity" type="number" value="15" min="1" required />
+            </label>
+            <button type="submit">Create purchase order</button>
+          </form>
+        </article>
+
+        <article class="card">
+          <h2>4. Capture sale</h2>
+          <form id="order-form">
+            <label>
+              Order ID
+              <input name="id" value="sale-2026" required />
+            </label>
+            <label>
+              Customer
+              <select name="customerId" id="customer-select"></select>
+            </label>
+            <label>
+              Inventory item
+              <select name="itemId" id="inventory-select"></select>
+            </label>
+            <label>
+              Quantity
+              <input name="quantity" type="number" value="2" min="1" required />
+            </label>
+            <label>
+              Payment method
+              <select name="paymentMethod">
+                <option value="card">Card</option>
+                <option value="cash">Cash</option>
+              </select>
+            </label>
+            <button type="submit">Create order</button>
+          </form>
+        </article>
+      </section>
+
+      <section class="card">
+        <div class="dashboard-header">
+          <h2>Operational snapshot</h2>
+          <button id="refresh-button" type="button">Refresh data</button>
+        </div>
+        <div class="dashboard-grid">
+          <div>
+            <h3>Inventory</h3>
+            <ul id="inventory-list"></ul>
+          </div>
+          <div>
+            <h3>Customers</h3>
+            <ul id="customer-list"></ul>
+          </div>
+          <div>
+            <h3>Purchase Orders</h3>
+            <ul id="purchase-list"></ul>
+          </div>
+          <div>
+            <h3>Sales Orders</h3>
+            <ul id="sales-list"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Activity log</h2>
+        <pre id="log-output">Ready.</pre>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

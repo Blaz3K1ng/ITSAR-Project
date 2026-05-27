@@ -1,0 +1,5 @@
+node_modules/
+services/*/data/*.db
+services/*/data/*.json
+coverage/
+.DS_Store
