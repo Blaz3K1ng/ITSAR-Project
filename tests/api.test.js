@@ -55,6 +55,30 @@ test("inventory service reserves stock for authorized users", { concurrency: fal
   assert.equal(response.body.reservedItems[0].remainingQuantity, 23);
 });
 
+test("inventory service rejects over-reservation across duplicate line items", { concurrency: false }, async () => {
+  resetDatabases();
+  const authApp = await createAuthApp();
+  const inventoryApp = await createInventoryApp();
+
+  const loginResponse = await request(authApp).post("/api/v1/auth/login").send({
+    username: "cashier",
+    password: "cashier123",
+  });
+
+  const response = await request(inventoryApp)
+    .post("/api/v1/inventory/reserve")
+    .set("Authorization", "Bearer " + loginResponse.body.token)
+    .send({
+      lineItems: [
+        { itemId: "inv-milk", quantity: 20 },
+        { itemId: "inv-milk", quantity: 10 },
+      ],
+    });
+
+  assert.equal(response.status, 409);
+  assert.equal(response.body.message, "Insufficient stock for Oat Milk.");
+});
+
 test("sales service creates an order and propagates loyalty updates", { concurrency: false }, async () => {
   resetDatabases();
   const authApp = await createAuthApp();

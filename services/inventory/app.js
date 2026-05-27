@@ -109,6 +109,7 @@ async function createApp() {
       return;
     }
 
+    const requestedQuantities = new Map();
     const reservedItems = [];
 
     for (const lineItem of lineItems) {
@@ -126,7 +127,10 @@ async function createApp() {
         return;
       }
 
-      if (item.quantity < quantity) {
+      const totalRequested = (requestedQuantities.get(item.id) || 0) + quantity;
+      requestedQuantities.set(item.id, totalRequested);
+
+      if (item.quantity < totalRequested) {
         res.status(409).json({ message: `Insufficient stock for ${item.name}.` });
         return;
       }
