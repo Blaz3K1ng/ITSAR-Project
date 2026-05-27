@@ -37,7 +37,11 @@ async def forward_request(request: Request, service_key: str, subpath: str) -> R
     if not subpath:
         target_url = f"{base_url}/api/v1/{service_key}"
 
-    headers = {k: v for k, v in request.headers.items() if k.lower() != "host"}
+    headers = {
+        k: v
+        for k, v in request.headers.items()
+        if k.lower() not in {"host", "accept-encoding"}
+    }
     body = await request.body()
 
     async with httpx.AsyncClient(timeout=20.0) as client:
@@ -52,7 +56,8 @@ async def forward_request(request: Request, service_key: str, subpath: str) -> R
     filtered_headers = {
         k: v
         for k, v in upstream_response.headers.items()
-        if k.lower() not in {"content-encoding", "transfer-encoding", "connection"}
+        if k.lower()
+        not in {"content-encoding", "transfer-encoding", "connection", "content-length"}
     }
 
     return Response(
