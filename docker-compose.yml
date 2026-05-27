@@ -1,0 +1,93 @@
+services:
+  auth-service:
+    build:
+      context: .
+      args:
+        SERVICE_DIR: services/auth
+    environment:
+      PORT: 4001
+      JWT_SECRET: super-secret-demo-key
+      SERVICE_TOKEN: internal-service-token
+    ports:
+      - "4001:4001"
+
+  inventory-service:
+    build:
+      context: .
+      args:
+        SERVICE_DIR: services/inventory
+    environment:
+      PORT: 4002
+      JWT_SECRET: super-secret-demo-key
+      SERVICE_TOKEN: internal-service-token
+    ports:
+      - "4002:4002"
+    depends_on:
+      - auth-service
+
+  sales-service:
+    build:
+      context: .
+      args:
+        SERVICE_DIR: services/sales
+    environment:
+      PORT: 4003
+      JWT_SECRET: super-secret-demo-key
+      SERVICE_TOKEN: internal-service-token
+      INVENTORY_SERVICE_URL: http://inventory-service:4002
+      CRM_SERVICE_URL: http://crm-service:4005
+    ports:
+      - "4003:4003"
+    depends_on:
+      - inventory-service
+      - crm-service
+
+  purchasing-service:
+    build:
+      context: .
+      args:
+        SERVICE_DIR: services/purchasing
+    environment:
+      PORT: 4004
+      JWT_SECRET: super-secret-demo-key
+      SERVICE_TOKEN: internal-service-token
+    ports:
+      - "4004:4004"
+    depends_on:
+      - auth-service
+
+  crm-service:
+    build:
+      context: .
+      args:
+        SERVICE_DIR: services/crm
+    environment:
+      PORT: 4005
+      JWT_SECRET: super-secret-demo-key
+      SERVICE_TOKEN: internal-service-token
+    ports:
+      - "4005:4005"
+    depends_on:
+      - auth-service
+
+  api-gateway:
+    build:
+      context: .
+      args:
+        SERVICE_DIR: gateway
+    environment:
+      PORT: 4000
+      JWT_SECRET: super-secret-demo-key
+      AUTH_SERVICE_URL: http://auth-service:4001
+      INVENTORY_SERVICE_URL: http://inventory-service:4002
+      SALES_SERVICE_URL: http://sales-service:4003
+      PURCHASING_SERVICE_URL: http://purchasing-service:4004
+      CRM_SERVICE_URL: http://crm-service:4005
+    ports:
+      - "4000:4000"
+    depends_on:
+      - auth-service
+      - inventory-service
+      - sales-service
+      - purchasing-service
+      - crm-service
