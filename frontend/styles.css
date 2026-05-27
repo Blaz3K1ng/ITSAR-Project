@@ -1,0 +1,84 @@
+:root {
+  --bg: #f4f1ea;
+  --card: #fff9ee;
+  --ink: #2f2619;
+  --accent: #a35f2a;
+  --accent-2: #d88a43;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  color: var(--ink);
+  background: radial-gradient(circle at top, #fff7e8, var(--bg));
+}
+
+.shell {
+  width: min(1000px, 92vw);
+  margin: 2rem auto;
+  display: grid;
+  gap: 1rem;
+}
+
+.hero {
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  color: #fff;
+  padding: 1.2rem;
+  border-radius: 12px;
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid #ead9bf;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+h1, h2 {
+  margin: 0 0 0.6rem;
+}
+
+input {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccb996;
+  border-radius: 8px;
+}
+
+button {
+  padding: 0.6rem 1rem;
+  margin-right: 0.5rem;
+  margin-top: 0.5rem;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.grid2, .grid3, .grid4 {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.grid2 { grid-template-columns: repeat(2, 1fr); }
+.grid3 { grid-template-columns: repeat(3, 1fr); }
+.grid4 { grid-template-columns: repeat(4, 1fr); }
+
+pre {
+  margin-top: 0.8rem;
+  background: #fff;
+  border: 1px solid #e6d7bf;
+  border-radius: 8px;
+  padding: 0.7rem;
+  max-height: 220px;
+  overflow: auto;
+}
+
+@media (max-width: 800px) {
+  .grid2, .grid3, .grid4 { grid-template-columns: 1fr; }
+}

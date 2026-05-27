@@ -1,0 +1,85 @@
+version: "3.9"
+
+services:
+  gateway:
+    build: ./gateway
+    ports:
+      - "8000:8000"
+    environment:
+      AUTH_URL: ${AUTH_URL}
+      INVENTORY_URL: ${INVENTORY_URL}
+      SALES_URL: ${SALES_URL}
+      PURCHASING_URL: ${PURCHASING_URL}
+      CRM_URL: ${CRM_URL}
+    depends_on:
+      - auth-service
+      - inventory-service
+      - sales-service
+      - purchasing-service
+      - crm-service
+
+  auth-service:
+    build: ./services/auth-service
+    ports:
+      - "8001:8001"
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+    volumes:
+      - ./data/auth:/data
+
+  inventory-service:
+    build: ./services/inventory-service
+    ports:
+      - "8002:8002"
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      SERVICE_TOKEN: ${SERVICE_TOKEN}
+    volumes:
+      - ./data/inventory:/data
+
+  sales-service:
+    build: ./services/sales-service
+    ports:
+      - "8003:8003"
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      SERVICE_TOKEN: ${SERVICE_TOKEN}
+      INVENTORY_URL: ${INVENTORY_URL}
+      CRM_URL: ${CRM_URL}
+    depends_on:
+      - inventory-service
+      - crm-service
+    volumes:
+      - ./data/sales:/data
+
+  purchasing-service:
+    build: ./services/purchasing-service
+    ports:
+      - "8004:8004"
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      SERVICE_TOKEN: ${SERVICE_TOKEN}
+      INVENTORY_URL: ${INVENTORY_URL}
+    depends_on:
+      - inventory-service
+    volumes:
+      - ./data/purchasing:/data
+
+  crm-service:
+    build: ./services/crm-service
+    ports:
+      - "8005:8005"
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      SERVICE_TOKEN: ${SERVICE_TOKEN}
+    volumes:
+      - ./data/crm:/data
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    environment:
+      API_BASE_URL: ${API_BASE_URL}
+    depends_on:
+      - gateway

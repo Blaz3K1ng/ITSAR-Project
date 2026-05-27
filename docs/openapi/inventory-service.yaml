@@ -1,0 +1,54 @@
+openapi: 3.0.3
+info:
+  title: Inventory Service API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+paths:
+  /api/v1/inventory/items:
+    get:
+      summary: List inventory items
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Create inventory item
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sku, name, quantity, unit_price, reorder_level]
+              properties:
+                sku: { type: string }
+                name: { type: string }
+                quantity: { type: integer }
+                unit_price: { type: number }
+                reorder_level: { type: integer }
+      responses:
+        '200': { description: Created }
+  /api/v1/inventory/adjust:
+    post:
+      summary: Adjust stock by delta
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [item_id, delta, reason]
+              properties:
+                item_id: { type: integer }
+                delta: { type: integer }
+                reason: { type: string }
+      responses:
+        '200': { description: Updated }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

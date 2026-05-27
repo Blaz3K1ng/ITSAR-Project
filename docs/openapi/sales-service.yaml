@@ -1,0 +1,38 @@
+openapi: 3.0.3
+info:
+  title: Sales Service API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+paths:
+  /api/v1/sales/orders:
+    get:
+      summary: List sales orders
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Create sales order and reserve stock
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customer_id, item_id, quantity, unit_price]
+              properties:
+                customer_id: { type: integer }
+                item_id: { type: integer }
+                quantity: { type: integer, minimum: 1 }
+                unit_price: { type: number, minimum: 0.01 }
+      responses:
+        '200': { description: Created }
+        '400': { description: Validation/stock failure }
+        '403': { description: Forbidden }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,70 @@
+openapi: 3.0.3
+info:
+  title: Purchasing Service API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+paths:
+  /api/v1/purchasing/suppliers:
+    get:
+      summary: List suppliers
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Create supplier
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, contact_email]
+              properties:
+                name: { type: string }
+                contact_email: { type: string, format: email }
+      responses:
+        '200': { description: Created }
+  /api/v1/purchasing/purchase-orders:
+    get:
+      summary: List purchase orders
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Create purchase order
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [supplier_id, item_id, quantity]
+              properties:
+                supplier_id: { type: integer }
+                item_id: { type: integer }
+                quantity: { type: integer, minimum: 1 }
+      responses:
+        '200': { description: Created }
+        '403': { description: Forbidden }
+  /api/v1/purchasing/purchase-orders/{po_id}/receive:
+    post:
+      summary: Receive PO and restock inventory
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: po_id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: Received }
+        '400': { description: Invalid PO state }
+        '403': { description: Forbidden }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

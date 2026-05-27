@@ -1,0 +1,12 @@
+{
+  "name": "itsar-mini-erp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mini ERP microservices project deliverables tooling",
+  "scripts": {
+    "export:pdf": "node scripts/export-pdfs.mjs"
+  },
+  "devDependencies": {
+    "md-to-pdf": "^5.2.4"
+  }
+}

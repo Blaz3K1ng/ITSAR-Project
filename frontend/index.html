@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ITSAR Mini ERP</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <h1>ITSAR Mini ERP</h1>
+      <p>Microservices demo for Inventory, Sales, Purchasing, CRM, and Auth.</p>
+    </header>
+
+    <section class="panel">
+      <h2>API Connection</h2>
+      <label for="apiBase">Gateway URL</label>
+      <input id="apiBase" value="https://your-gateway.onrender.com" />
+    </section>
+
+    <section class="panel">
+      <h2>Login</h2>
+      <div class="grid2">
+        <input id="username" placeholder="username" value="admin" />
+        <input id="password" placeholder="password" type="password" value="admin123" />
+      </div>
+      <button id="loginBtn">Login</button>
+      <p id="authStatus">Not logged in</p>
+    </section>
+
+    <section class="panel">
+      <h2>Inventory</h2>
+      <button id="loadInventoryBtn">Load Items</button>
+      <pre id="inventoryOut"></pre>
+    </section>
+
+    <section class="panel">
+      <h2>Customers</h2>
+      <button id="loadCustomersBtn">Load Customers</button>
+      <pre id="customersOut"></pre>
+    </section>
+
+    <section class="panel">
+      <h2>Create Sales Order</h2>
+      <div class="grid4">
+        <input id="orderCustomerId" placeholder="customer_id" value="1" />
+        <input id="orderItemId" placeholder="item_id" value="1" />
+        <input id="orderQty" placeholder="quantity" value="2" />
+        <input id="orderPrice" placeholder="unit_price" value="18.5" />
+      </div>
+      <button id="createOrderBtn">Create Order</button>
+      <pre id="orderOut"></pre>
+    </section>
+
+    <section class="panel">
+      <h2>Purchasing</h2>
+      <div class="grid3">
+        <input id="poSupplierId" placeholder="supplier_id" value="1" />
+        <input id="poItemId" placeholder="item_id" value="1" />
+        <input id="poQty" placeholder="quantity" value="10" />
+      </div>
+      <button id="createPoBtn">Create Purchase Order</button>
+      <button id="receivePoBtn">Receive PO #1</button>
+      <pre id="poOut"></pre>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
