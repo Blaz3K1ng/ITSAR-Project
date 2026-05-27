@@ -3,12 +3,12 @@
 ## 6. Source Code Hosted in Git Repository
 
 - [x] Local repository initialized
-- [ ] Remote repository created (GitHub/GitLab)
-- [ ] Code pushed to remote default branch
-- [ ] Repository link ready for instructor
+- [x] Remote repository created (GitHub/GitLab)
+- [x] Code pushed to remote default branch
+- [x] Repository link ready for instructor
 
 Repository link:
-- [ ] Paste here: `<REPO_URL>`
+- [x] Paste here: `https://github.com/Blaz3K1ng/ITSAR-Project.git`
 
 ## 7. Business Documentation (PDF)
 
