@@ -49,6 +49,8 @@ flowchart TB
 - Authentication uses **JWT**.
 - Role claims are included in the token and enforced at each protected endpoint.
 - Internal service calls use a shared `SERVICE_TOKEN` header for service-to-service trust, while public business routes remain JWT-protected.
+- The gateway and each service apply **rate limiting** to reduce abuse on public API routes.
+- Internal service base URLs are restricted to an allowlisted set of hosts and ports before the sales service can call them.
 
 ## Data Models
 ### User

@@ -62,7 +62,9 @@ test("sales service creates an order and propagates loyalty updates", { concurre
 
   const originalFetch = global.fetch;
   global.fetch = async (url) => {
-    if (url.includes("/inventory/reserve")) {
+    const requestUrl = String(url);
+
+    if (requestUrl.includes("/inventory/reserve")) {
       return {
         ok: true,
         json: async () => ({

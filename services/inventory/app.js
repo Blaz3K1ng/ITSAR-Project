@@ -1,6 +1,7 @@
 const path = require("path");
 const express = require("express");
 const { createDatabase } = require("../../lib/db");
+const { createApiRateLimiter } = require("../../lib/rate-limit");
 const { authorizeRoles, authorizeRolesOrService } = require("../../lib/security");
 
 const seedItems = [
@@ -46,6 +47,7 @@ async function createApp() {
   const app = express();
 
   app.use(express.json());
+  app.use("/api/v1", createApiRateLimiter());
 
   app.get("/health", (req, res) => {
     res.json({ service: "inventory-service", status: "ok" });

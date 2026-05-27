@@ -1,9 +1,12 @@
 const path = require("path");
 const express = require("express");
 const { createDatabase } = require("../../lib/db");
+const { createApiRateLimiter } = require("../../lib/rate-limit");
 const { authorizeRoles } = require("../../lib/security");
+const { resolveServiceBaseUrl } = require("../../lib/service-url");
 
-async function postJson(url, body) {
+async function postInternalJson(serviceName, routePath, body) {
+  const url = new URL(routePath, resolveServiceBaseUrl(serviceName));
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -16,7 +19,7 @@ async function postJson(url, body) {
   const payload = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    const error = new Error(payload.message || `Request to ${url} failed.`);
+    const error = new Error(payload.message || `Request to ${url.toString()} failed.`);
     error.statusCode = response.status;
     throw error;
   }
@@ -37,6 +40,7 @@ async function createApp() {
   const app = express();
 
   app.use(express.json());
+  app.use("/api/v1", createApiRateLimiter());
 
   app.get("/health", (req, res) => {
     res.json({ service: "sales-service", status: "ok" });
@@ -66,8 +70,9 @@ async function createApp() {
     }
 
     try {
-      const inventoryPayload = await postJson(
-        `${process.env.INVENTORY_SERVICE_URL || "http://localhost:4002"}/api/v1/inventory/reserve`,
+      const inventoryPayload = await postInternalJson(
+        "inventory",
+        "/api/v1/inventory/reserve",
         { lineItems }
       );
 
@@ -95,8 +100,9 @@ async function createApp() {
       if (customerId) {
         try {
           const points = Math.max(1, Math.floor(total / 5));
-          const crmPayload = await postJson(
-            `${process.env.CRM_SERVICE_URL || "http://localhost:4005"}/api/v1/crm/customers/${customerId}/loyalty`,
+          const crmPayload = await postInternalJson(
+            "crm",
+            `/api/v1/crm/customers/${encodeURIComponent(customerId)}/loyalty`,
             { points }
           );
           updatedCustomer = crmPayload.customer;

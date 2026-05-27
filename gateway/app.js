@@ -2,6 +2,7 @@ const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const { createProxyMiddleware } = require("http-proxy-middleware");
+const { createApiRateLimiter } = require("../lib/rate-limit");
 
 function createProxy(target) {
   return createProxyMiddleware({
@@ -17,6 +18,7 @@ function createApp() {
   const frontendDir = path.join(__dirname, "..", "frontend");
 
   app.use(cors());
+  app.use(createApiRateLimiter());
   app.use(express.static(frontendDir));
 
   app.get("/health", (req, res) => {
